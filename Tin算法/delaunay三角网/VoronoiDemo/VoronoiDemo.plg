@@ -1,0 +1,42 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: VoronoiDemo - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\Users\ADMINI~1\AppData\Local\Temp\RSP7282.tmp" with contents
+[
+/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /FR"Debug/" /Fp"Debug/VoronoiDemo.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"E:\Programing\工程文件\GIS\泰森多边形\delaunay三角网\VoronoiDemo\VoronoiDemoView.cpp"
+]
+Creating command line "cl.exe @C:\Users\ADMINI~1\AppData\Local\Temp\RSP7282.tmp" 
+Creating temporary file "C:\Users\ADMINI~1\AppData\Local\Temp\RSP7283.tmp" with contents
+[
+/nologo /subsystem:windows /incremental:yes /pdb:"Debug/VoronoiDemo.pdb" /debug /machine:I386 /out:"Debug/VoronoiDemo.exe" /pdbtype:sept 
+".\Debug\MainFrm.obj"
+".\Debug\StdAfx.obj"
+".\Debug\VoronoiDemo.obj"
+".\Debug\VoronoiDemoDoc.obj"
+".\Debug\VoronoiDemoView.obj"
+".\Debug\VoronoiDemo.res"
+]
+Creating command line "link.exe @C:\Users\ADMINI~1\AppData\Local\Temp\RSP7283.tmp"
+<h3>Output Window</h3>
+Compiling...
+VoronoiDemoView.cpp
+E:\Programing\工程文件\GIS\泰森多边形\delaunay三角网\VoronoiDemo\VoronoiDemoView.cpp(452) : warning C4715: 'CVoronoiDemoView::LookForFirstTriangle' : not all control paths return a value
+E:\Programing\工程文件\GIS\泰森多边形\delaunay三角网\VoronoiDemo\VoronoiDemoView.cpp(536) : warning C4715: 'CVoronoiDemoView::GetTriangleThirdPoint' : not all control paths return a value
+Linking...
+Creating command line "bscmake.exe /nologo /o"Debug/VoronoiDemo.bsc"  ".\Debug\StdAfx.sbr" ".\Debug\MainFrm.sbr" ".\Debug\VoronoiDemo.sbr" ".\Debug\VoronoiDemoDoc.sbr" ".\Debug\VoronoiDemoView.sbr""
+Creating browse info file...
+<h3>Output Window</h3>
+
+
+
+<h3>Results</h3>
+VoronoiDemo.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
