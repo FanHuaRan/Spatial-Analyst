@@ -7,48 +7,58 @@ using System.Threading.Tasks;
 
 namespace OverlayDemo.Core
 {
+    /// <summary>
+    /// 裁剪实现类
+    /// </summary>
     class CutCoreClass:ICutCore
     {
+        //基本空间分析字段
         private IGraphCore graphCore;
+
         public CutCoreClass(IGraphCore graphCore)
         {
             this.graphCore = graphCore;
         }
+
         public List<List<MyPoint>> CutAlgorithm(Entity.MyPolygon polygon, List<MyPoint> points)
         {
+            //结果线段集
             List<List<MyPoint>> resultPointArray = new List<List<MyPoint>>();
-            //求所有交点
+            //所有交点
             List<MyPoint> interPoints = GetAllIntersePoint(polygon, points);
             //考虑没有交点的情况 全在多边形内或者全在多边形外
-            if(interPoints.Count==0)
+            if (interPoints.Count == 0)
             {
                 //判断一个点是否在多边形内 则返回全部线点
-                if(graphCore.JudgePointWithPolygon(points[0],polygon)==2)
+                if (graphCore.JudgePointWithPolygon(points[0], polygon) == 2)
                 {
-                    resultPointArray.Add(points);
+                    MyPoint[] pointArray = new MyPoint[points.Count];
+                    points.CopyTo(pointArray);
+                    resultPointArray.Add(pointArray.ToList<MyPoint>());
                 }
                 return resultPointArray;
             }
             //将交点有序插入序列中得到新序列
             List<MyPoint> newPoints = InsertPoint(points, interPoints);
-            //判断出入点
-          //  DefineOutIn(polygon, newPoints);
+            //求解保留点过程中是否连续的标志位
+            bool contin = false;
             List<MyPoint> tempPoints = new List<MyPoint>();
-            bool isLianxu = false;
             //得出保留点
-            for (int i = 0; i < newPoints.Count;i++ )
+            for (int i = 0; i < newPoints.Count; i++)
             {
                 MyPoint point = newPoints[i];
+                //该点在多边形之外
                 if (graphCore.JudgePointWithPolygon(point, polygon) == 0)
                 {
-                    if(isLianxu)
+                    if (contin)
                     {
                         resultPointArray.Add(tempPoints);
                     }
-                    isLianxu = false;
+                    contin = false;
                     continue;
                 }
-                if (isLianxu)
+                //点在多边形内
+                if (contin)
                 {
                     tempPoints.Add(point);
                 }
@@ -57,10 +67,16 @@ namespace OverlayDemo.Core
                     tempPoints = new List<MyPoint>();
                     tempPoints.Add(point);
                 }
-                isLianxu = true;
+                contin = true;
             }
             return resultPointArray;
         }
+        /// <summary>
+        /// 获取线段与多边形的所有交点
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <param name="points"></param>
+        /// <returns></returns>
         private List<MyPoint> GetAllIntersePoint(MyPolygon polygon,List<MyPoint>points)
         {
             List<MyPoint> interPoints = new List<MyPoint>();
@@ -81,6 +97,12 @@ namespace OverlayDemo.Core
             }
             return interPoints;
         }
+        /// <summary>
+        /// 利用射线算法有序插入交点
+        /// </summary>
+        /// <param name="points"></param>
+        /// <param name="interPoints"></param>
+        /// <returns></returns>
         private List<MyPoint> InsertPoint(List<MyPoint> points,List<MyPoint> interPoints)
         {
             List<MyPoint> newPoints = points.ToList<MyPoint>();
@@ -99,7 +121,11 @@ namespace OverlayDemo.Core
             }
             return newPoints;
         }
-        //判断出入点
+        /// <summary>
+        /// 出入点判断
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <param name="points"></param>
         private void DefineOutIn(MyPolygon polygon,List<MyPoint> points)
         {
             for(int i=0;i<points.Count;i++)

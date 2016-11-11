@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace DijkstraDemo.Util
 {
+    /// <summary>
+    ///辅助帮助类
+    /// </summary>
     class UtilHelper
     {
         //构造邻接矩阵

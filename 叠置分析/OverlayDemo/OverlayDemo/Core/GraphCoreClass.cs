@@ -6,17 +6,21 @@ using System.Threading.Tasks;
 using OverlayDemo.Entity;
 namespace OverlayDemo.Core
 {
+    /// <summary>
+    /// 基本空间分析实现类
+    /// </summary>
     class GraphCoreClass : IGraphCore
     {
+        //射线算法中用于构建射线
         private int MINVALUE = -1;
         //误差值
-        private int wucha = 200;
+        private int rightValue = 200;
         /// <summary>
-        /// 利用右手法则判断关系 返回1代表在线上 2代表在线段延长线上 3在线段右方 4在线段左方
+        /// 利用右手法则判断关系 
         /// </summary>
         /// <param name="point"></param>
         /// <param name="polyLine"></param>
-        /// <returns></returns>
+        /// <returns>1代表在线上 2代表在线段延长线上 3在线段右方 4在线段左方</returns>
         public int JudgePointWithLine(MyPoint point, MyPolyline polyLine)
         {
             IMatirx matrix = new MatrixClass();
@@ -29,7 +33,7 @@ namespace OverlayDemo.Core
             arrys.Add(thirdRow);
             float value = matrix.GetRowColumnValue(arrys);
             //为了抵消误差 不用0
-            if (Math.Abs(value)<=wucha)
+            if (Math.Abs(value)<=rightValue)
             {
                 if (IsInLineCore(point, polyLine))
                 {
@@ -40,7 +44,7 @@ namespace OverlayDemo.Core
                     return 2;
                 }
             }
-            else if (value >wucha)
+            else if (value >rightValue)
             {
                 return 3;
             }
@@ -49,7 +53,12 @@ namespace OverlayDemo.Core
                 return 4;
             }
         }
-        //是否在线段中央
+        /// <summary>
+        /// 判断点是否在线段两个X坐标中央
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="polyLine"></param>
+        /// <returns></returns>
         private bool IsInLineCore(MyPoint point, MyPolyline polyLine)
         {
             int x1 = polyLine.Point1.X;
@@ -69,15 +78,25 @@ namespace OverlayDemo.Core
                 return false;
             }
         }
-        // 计算叉乘 |P0P1| × |P0P2| 
+        /// <summary>
+        /// 计算叉积
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <param name="p0"></param>
+        /// <returns></returns>
         private float Multiply(MyPoint p1, MyPoint p2, MyPoint p0)
         {
 
             return ((p1.X - p0.X) * (p2.Y - p0.Y) - (p2.X - p0.X) * (p1.Y - p0.Y));
 
         }
-        //判断线与线是否相交 1为相交 0为不相交
-        //应用了矢量外积算法
+        /// <summary>
+        /// 应用矢量外积算法判断两线段是否相交
+        /// </summary>
+        /// <param name="linea"></param>
+        /// <param name="lineB"></param>
+        /// <returns></returns>
         public int JudgeLineWithLine(MyPolyline linea, MyPolyline lineB)
         {
             
@@ -99,11 +118,13 @@ namespace OverlayDemo.Core
             {
                 return 0;
             }
-             
-  
         }
-        //使用射线算法判断点与多边形关系 奇内外偶
-        //1在线上 2在多边形内 0在多边形外
+        /// <summary>
+        /// 使用射线算法判断点与多边形关系 奇内外偶
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="polygon"></param>
+        /// <returns>1在线上 2在多边形内 0在多边形外</returns>
         public int JudgePointWithPolygon(MyPoint point, MyPolygon polygon)
         {
             int n = polygon.Polylines.Count;
@@ -152,7 +173,12 @@ namespace OverlayDemo.Core
                 return 0;
             }
         }
-
+        /// <summary>
+        /// 获取两线段交点
+        /// </summary>
+        /// <param name="linea"></param>
+        /// <param name="lineb"></param>
+        /// <returns></returns>
         public MyPoint GetIntersectionPoint(MyPolyline linea, MyPolyline lineb)
         {
             MyPoint pointx1 = linea.Point1;

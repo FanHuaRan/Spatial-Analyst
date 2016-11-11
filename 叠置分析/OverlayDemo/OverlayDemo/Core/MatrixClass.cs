@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using OverlayDemo.Entity;
 namespace OverlayDemo.Core
 {
+    /// <summary>
+    /// 矩阵操作实现
+    /// </summary>
     class MatrixClass :IMatirx
     {
         public float GetRowColumnValue(List<List<float>> matrix)

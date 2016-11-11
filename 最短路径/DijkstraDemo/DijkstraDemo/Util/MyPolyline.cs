@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace DijkstraDemo.Util
 {
+    /// <summary>
+    /// 线
+    /// </summary>
     class MyPolyline
     {
         public MyPoint Point1{get;set;}

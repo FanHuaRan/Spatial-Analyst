@@ -27,7 +27,6 @@ namespace DijkstraDemo
         private List<int> path = null;
         public Form1()
         {
-            
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterScreen;
             this.panel3.Visible = false;
@@ -44,9 +43,7 @@ namespace DijkstraDemo
         {
             ClearResult();
         }
-        #region 画图方法
-        
-        #endregion
+       
         //清除计算和缓存结果
         private void ClearResult()
         {
@@ -246,9 +243,5 @@ namespace DijkstraDemo
             }
             this.pictureBox1.Image = map;
         }
-
-    
-
-  
     }
 }

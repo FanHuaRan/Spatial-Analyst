@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace DijkstraDemo.Util
 {
+    /// <summary>
+    /// 点
+    /// </summary>
     class MyPoint
     {
         public int X { get; set; }

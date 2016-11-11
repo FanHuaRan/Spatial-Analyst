@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace OverlayDemo.Entity
 {
+    /// <summary>
+    /// 多边形
+    /// </summary>
     class MyPolygon
     {
         public List<MyPolyline> Polylines { get; set; }

@@ -6,9 +6,18 @@ using System.Threading.Tasks;
 
 namespace DijkstraDemo.Dijkstra
 {
+    /// <summary>
+    /// 迪杰斯特拉算法实现
+    /// </summary>
     public class SimpleDijkstra:IDijkstra
     {
-
+        /// <summary>
+        /// 指定起点 求到所有点的最短路径
+        /// </summary>
+        /// <param name="cost"></param>
+        /// <param name="startPoint"></param>
+        /// <param name="dist"></param>
+        /// <returns></returns>
         public List<List<int>> ALL_SHORTEST_PATH(List<List<float>> cost, int startPoint, out List<float> dist)
         {
             if(cost==null||startPoint<-1||startPoint>cost.Count)
@@ -65,7 +74,14 @@ namespace DijkstraDemo.Dijkstra
             }
             return path;
         }
-
+        /// <summary>
+        /// 指定起点和终点，求最短路径
+        /// </summary>
+        /// <param name="cost"></param>
+        /// <param name="startPoint"></param>
+        /// <param name="endPoint"></param>
+        /// <param name="dist"></param>
+        /// <returns></returns>
         public List<int> SHORTEST_PATH(List<List<float>> cost, int startPoint, int endPoint, out float singledist)
         {
             if (cost == null || startPoint < 0 || startPoint > cost.Count-1||endPoint<0||endPoint>cost.Count-1)

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace OverlayDemo.Entity
 {
+    /// <summary>
+    /// 线段
+    /// </summary>
     class MyPolyline
     {
         public MyPoint Point1{get;set;}

@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace DijkstraDemo.Util
 {
+    /// <summary>
+    /// 绘图帮助类
+    /// </summary>
     class DrawHelper
     {
         private static Pen myPen = new Pen(Color.Red,1);
