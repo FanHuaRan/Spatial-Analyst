@@ -6,13 +6,13 @@
 --------------------Configuration: WeilerAthertonDemo - Win32 Debug--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\Users\ADMINI~1\AppData\Local\Temp\RSPF383.tmp" with contents
+Creating temporary file "C:\Users\ADMINI~1\AppData\Local\Temp\RSPD77C.tmp" with contents
 [
 /nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /Fp"Debug/WeilerAthertonDemo.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
 "E:\Programing\Spatial-Analyst\ÍØÆË¶à±ßÐÎ²Ã¼ô\WeilerAthertonDemo\WeilerAthertonDemoView.cpp"
 ]
-Creating command line "cl.exe @C:\Users\ADMINI~1\AppData\Local\Temp\RSPF383.tmp" 
-Creating temporary file "C:\Users\ADMINI~1\AppData\Local\Temp\RSPF384.tmp" with contents
+Creating command line "cl.exe @C:\Users\ADMINI~1\AppData\Local\Temp\RSPD77C.tmp" 
+Creating temporary file "C:\Users\ADMINI~1\AppData\Local\Temp\RSPD77D.tmp" with contents
 [
 /nologo /subsystem:windows /incremental:yes /pdb:"Debug/WeilerAthertonDemo.pdb" /debug /machine:I386 /out:"Debug/WeilerAthertonDemo.exe" /pdbtype:sept 
 ".\Debug\MainFrm.obj"
@@ -22,7 +22,7 @@ Creating temporary file "C:\Users\ADMINI~1\AppData\Local\Temp\RSPF384.tmp" with 
 ".\Debug\WeilerAthertonDemoView.obj"
 ".\Debug\WeilerAthertonDemo.res"
 ]
-Creating command line "link.exe @C:\Users\ADMINI~1\AppData\Local\Temp\RSPF384.tmp"
+Creating command line "link.exe @C:\Users\ADMINI~1\AppData\Local\Temp\RSPD77D.tmp"
 <h3>Output Window</h3>
 Compiling...
 WeilerAthertonDemoView.cpp

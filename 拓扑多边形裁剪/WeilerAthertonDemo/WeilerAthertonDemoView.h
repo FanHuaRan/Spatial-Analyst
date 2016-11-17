@@ -9,7 +9,7 @@
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
-
+/**********************************数据结构定义***********************************/
 //点结构体设计
 struct WeilerPoint
 {
@@ -53,6 +53,9 @@ struct WeilerGenPolygon
 {
    vector<WeilerPolygon> polygons;
 };
+/*****************************************************************************************/
+
+
 class CWeilerAthertonDemoView : public CView
 {
 protected: // create from serialization only
@@ -109,7 +112,7 @@ protected:
 	void DrawResult(WeilerGenPolygon polygons);
 	void showVecter(vector<WeilerPoint> points);
 	void showIndex(vector<int> indexs);
-	//比较远近
+	//比较s三点远近
 	int CompareDistance(WeilerPoint startPoint,WeilerPoint endPoint1,WeilerPoint endPoint2);
 	//寻找裁剪多边形的插入索引
 	int CWeilerAthertonDemoView::GetInsertClippedIndex(vector<WeilerPoint> points,vector<WeilerPoint> insertPoints,int index);

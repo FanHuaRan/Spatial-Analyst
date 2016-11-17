@@ -291,28 +291,29 @@ void CWeilerAthertonDemoView::DrawResult(WeilerGenPolygon polygons)
 		}
 	}
 }
+/**********************************算法核心***************************************************/
 //比较三点远近
-int CWeilerAthertonDemoView::CompareDistance(WeilerPoint startPoint,WeilerPoint endPoint1,WeilerPoint endPoint2)
-{
-  float xLen=endPoint1.x-startPoint.x;
-  float yLen=endPoint1.y-startPoint.y;
-  float lineDistance=xLen*xLen+yLen*yLen;
-  float xLen1=endPoint2.x-startPoint.x;
-  float yLen1=endPoint2.y-startPoint.y;
-  float lineDistance1=xLen1*xLen1+yLen1*yLen1;
-  return lineDistance>lineDistance1?1:0;
-}
+ int CWeilerAthertonDemoView::CompareDistance(WeilerPoint startPoint,WeilerPoint endPoint1,WeilerPoint endPoint2)
+ {
+   float xLen=endPoint1.x-startPoint.x;
+   float yLen=endPoint1.y-startPoint.y;
+   float lineDistance=xLen*xLen+yLen*yLen;
+   float xLen1=endPoint2.x-startPoint.x;
+   float yLen1=endPoint2.y-startPoint.y;
+   float lineDistance1=xLen1*xLen1+yLen1*yLen1;
+   return lineDistance>lineDistance1?1:0;
+ }
 //寻找两条线段的交点
 int CWeilerAthertonDemoView::GetIntersectionPoint(WeilerPoint pointx1,WeilerPoint pointy1,WeilerPoint pointx2,WeilerPoint pointy2,WeilerPoint &point)
 {
   /** 1 解线性方程组, 求线段交点. **/  
-// 如果分母为0 则平行或共线, 不相交  
+  // 如果分母为0 则平行或共线, 不相交  
     float denominator = (pointy1.y - pointx1.y)*(pointy2.x - pointx2.x) - (pointx1.x - pointy1.x)*(pointx2.y - pointy2.y);  
     if (denominator==0) {  
         return 0;  
     }  
    
-// 线段所在直线的交点坐标 (x , y)      
+  // 线段所在直线的交点坐标 (x , y)      
     float x = ( (pointy1.x - pointx1.x) * (pointy2.x - pointx2.x) * (pointx2.y - pointx1.y)   
                 + (pointy1.y - pointx1.y) * (pointy2.x - pointx2.x) * pointx1.x   
                 - (pointy2.y - pointx2.y) * (pointy1.x - pointx1.x) * pointx2.x ) / denominator ;  
@@ -320,7 +321,7 @@ int CWeilerAthertonDemoView::GetIntersectionPoint(WeilerPoint pointx1,WeilerPoin
                 + (pointy1.x - pointx1.x) * (pointy2.y - pointx2.y) * pointx1.y   
                 - (pointy2.x - pointx2.x) * (pointy1.y - pointx1.y) * pointx2.y ) / denominator;  
   
-/** 2 判断交点是否在两条线段上 **/  
+  /** 2 判断交点是否在两条线段上 **/  
     if (  
         // 交点在线段1上  
         (x - pointx1.x) * (x - pointy1.x) <= 0 && (y - pointx1.y) * (y - pointy1.y) <= 0  
@@ -510,7 +511,7 @@ vector<WeilerPoint> CWeilerAthertonDemoView::GetNewListPointClipping(WeilerPolyg
   }
   return resultPoints;
 }
-//寻找第一个序列中所出现的入点 返回索引 注意入点是不可能位于第一个元素的 所以返回0代表没有找到
+//寻找点集序列中所出现的入点 返回索引 注意入点是不可能位于第一个元素的 所以返回0代表没有找到
 int CWeilerAthertonDemoView::GetIntoPoint(vector<WeilerPoint> &points,WeilerPoint &point)
 {
 	for(int i=0;i<points.size();i++)
@@ -563,20 +564,21 @@ void CWeilerAthertonDemoView::DeletePointIntoFlag(vector<WeilerPoint> &points,We
 //核心算法
 WeilerGenPolygon CWeilerAthertonDemoView::WeilerAtherton(WeilerPolygon polygonCliped,WeilerPolygon polygonCliping)
 {
+	//输出结果变量
 	WeilerGenPolygon resultPolygons;
-	//寻找交点集
+	//求得交点集
 	vector<WeilerPoint> interSectionPoints=CWeilerAthertonDemoView::GetIntersectionPoint(polygonCliped,polygonCliping);
 	//将交点插入被裁剪多边形顶点序列中
 	vector<WeilerPoint> newClippedPoints=CWeilerAthertonDemoView::GetNewListPointClipped(polygonCliped,interSectionPoints);
 	//将交点插入裁剪多边形顶点序列中
 	vector<WeilerPoint> newClippingPoints=CWeilerAthertonDemoView::GetNewListPointClipping(polygonCliping,interSectionPoints);
-	//读取点
+	//搜寻点
 	WeilerPoint point;
 	//暂存点
 	WeilerPoint storagePoint;
-	//搜寻索引
+	//被裁减多边形搜寻索引
 	int clippedSearchIndex=0;
-	//搜寻索引
+	//裁剪窗口搜寻索引
 	int clippingSearchIndex=0;
 	//当在newClippedPoints寻找到入点
 	while(CWeilerAthertonDemoView::GetIntoPoint(newClippedPoints,point))
@@ -639,6 +641,8 @@ WeilerGenPolygon CWeilerAthertonDemoView::WeilerAtherton(WeilerPolygon polygonCl
 	}
 	return resultPolygons;
 }
+
+/**********************************算法核心结束***************************************************/
 
 void CWeilerAthertonDemoView::showVecter(vector<WeilerPoint> points)
 {
