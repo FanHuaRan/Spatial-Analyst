@@ -66,10 +66,10 @@
             this.groupBox1.Controls.Add(this.detal_panel);
             this.groupBox1.Controls.Add(this.pictureBox1);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox1.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.groupBox1.Location = new System.Drawing.Point(0, 25);
+            this.groupBox1.Font = new System.Drawing.Font("仿宋", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.groupBox1.Location = new System.Drawing.Point(0, 24);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(901, 597);
+            this.groupBox1.Size = new System.Drawing.Size(901, 598);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "绘图区";
@@ -97,10 +97,10 @@
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.pointView);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Location = new System.Drawing.Point(4, 24);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(314, 556);
+            this.tabPage1.Size = new System.Drawing.Size(314, 554);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "顶点";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -110,17 +110,17 @@
             this.pointView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pointView.Location = new System.Drawing.Point(3, 3);
             this.pointView.Name = "pointView";
-            this.pointView.Size = new System.Drawing.Size(308, 550);
+            this.pointView.Size = new System.Drawing.Size(308, 548);
             this.pointView.TabIndex = 0;
             this.pointView.UseCompatibleStateImageBehavior = false;
             // 
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.triView);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(314, 556);
+            this.tabPage2.Size = new System.Drawing.Size(314, 554);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "三角形";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -130,16 +130,16 @@
             this.triView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.triView.Location = new System.Drawing.Point(3, 3);
             this.triView.Name = "triView";
-            this.triView.Size = new System.Drawing.Size(308, 550);
+            this.triView.Size = new System.Drawing.Size(308, 548);
             this.triView.TabIndex = 0;
             this.triView.UseCompatibleStateImageBehavior = false;
             // 
             // pictureBox1
             // 
             this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox1.Location = new System.Drawing.Point(3, 17);
+            this.pictureBox1.Location = new System.Drawing.Point(3, 19);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(895, 577);
+            this.pictureBox1.Size = new System.Drawing.Size(895, 576);
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             this.pictureBox1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseDown);
@@ -149,6 +149,7 @@
             // menuStrip1
             // 
             this.menuStrip1.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.menuStrip1.Font = new System.Drawing.Font("仿宋", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.画点ToolStripMenuItem,
             this.包围壳ToolStripMenuItem,
@@ -158,28 +159,28 @@
             this.显示号码ToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(901, 25);
+            this.menuStrip1.Size = new System.Drawing.Size(901, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
             // 画点ToolStripMenuItem
             // 
             this.画点ToolStripMenuItem.Name = "画点ToolStripMenuItem";
-            this.画点ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
+            this.画点ToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.画点ToolStripMenuItem.Text = "画点";
             this.画点ToolStripMenuItem.Click += new System.EventHandler(this.画点ToolStripMenuItem_Click);
             // 
             // 包围壳ToolStripMenuItem
             // 
             this.包围壳ToolStripMenuItem.Name = "包围壳ToolStripMenuItem";
-            this.包围壳ToolStripMenuItem.Size = new System.Drawing.Size(56, 21);
+            this.包围壳ToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.包围壳ToolStripMenuItem.Text = "包围壳";
             this.包围壳ToolStripMenuItem.Click += new System.EventHandler(this.包围壳ToolStripMenuItem_Click);
             // 
             // 构建ToolStripMenuItem
             // 
             this.构建ToolStripMenuItem.Name = "构建ToolStripMenuItem";
-            this.构建ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
+            this.构建ToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.构建ToolStripMenuItem.Text = "构建";
             this.构建ToolStripMenuItem.Click += new System.EventHandler(this.构建ToolStripMenuItem_Click);
             // 
@@ -190,7 +191,7 @@
             this.delaunaryToolStripMenuItem,
             this.圆心ToolStripMenuItem});
             this.查看ToolStripMenuItem.Name = "查看ToolStripMenuItem";
-            this.查看ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
+            this.查看ToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.查看ToolStripMenuItem.Text = "查看";
             // 
             // tinToolStripMenuItem
@@ -217,14 +218,14 @@
             // 清除ToolStripMenuItem
             // 
             this.清除ToolStripMenuItem.Name = "清除ToolStripMenuItem";
-            this.清除ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
+            this.清除ToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.清除ToolStripMenuItem.Text = "清除";
             this.清除ToolStripMenuItem.Click += new System.EventHandler(this.清除ToolStripMenuItem_Click);
             // 
             // 显示号码ToolStripMenuItem
             // 
             this.显示号码ToolStripMenuItem.Name = "显示号码ToolStripMenuItem";
-            this.显示号码ToolStripMenuItem.Size = new System.Drawing.Size(68, 21);
+            this.显示号码ToolStripMenuItem.Size = new System.Drawing.Size(75, 20);
             this.显示号码ToolStripMenuItem.Text = "显示号码";
             this.显示号码ToolStripMenuItem.Click += new System.EventHandler(this.显示号码ToolStripMenuItem_Click);
             // 
@@ -232,6 +233,7 @@
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("仿宋", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label1.Location = new System.Drawing.Point(708, 7);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(41, 12);
@@ -242,6 +244,7 @@
             // 
             this.pointLab.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pointLab.AutoSize = true;
+            this.pointLab.Font = new System.Drawing.Font("仿宋", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.pointLab.Location = new System.Drawing.Point(755, 7);
             this.pointLab.Name = "pointLab";
             this.pointLab.Size = new System.Drawing.Size(11, 12);
@@ -252,6 +255,7 @@
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("仿宋", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label3.Location = new System.Drawing.Point(772, 7);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(53, 12);
@@ -262,6 +266,7 @@
             // 
             this.TriLab.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.TriLab.AutoSize = true;
+            this.TriLab.Font = new System.Drawing.Font("仿宋", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.TriLab.Location = new System.Drawing.Point(831, 7);
             this.TriLab.Name = "TriLab";
             this.TriLab.Size = new System.Drawing.Size(11, 12);
@@ -271,6 +276,7 @@
             // moreBtt
             // 
             this.moreBtt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.moreBtt.Font = new System.Drawing.Font("仿宋", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.moreBtt.Location = new System.Drawing.Point(857, 2);
             this.moreBtt.Name = "moreBtt";
             this.moreBtt.Size = new System.Drawing.Size(38, 23);

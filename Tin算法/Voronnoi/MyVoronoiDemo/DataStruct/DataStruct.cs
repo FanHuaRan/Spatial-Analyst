@@ -25,9 +25,9 @@ namespace MrFan.Tool.Delaunry
         public long Vertex1ID;   //点索引
         public long Vertex2ID;
         public Boolean NotHullEdge;  //非凸壳边
-        public long AdjTriangle1ID;
-        public long AdjacentT1V3;    //△1的第三顶点在顶点数组的索引
-        public long AdjTriangle2ID;
+        public long AdjTriangle1ID;//其中一个三角形
+        public long AdjacentT1V3;    //三角形的第三顶点在顶点数组的索引
+        public long AdjTriangle2ID;//另外一个三角形
 
         public Edge(long iV1, long iV2)
         {
@@ -56,7 +56,7 @@ namespace MrFan.Tool.Delaunry
         public long V3Index;
     }
 
-    //外接圆心
+    //外接圆心/三角形外星
     public struct Barycenter
     {
         public double X;
@@ -74,14 +74,21 @@ namespace MrFan.Tool.Delaunry
     //总的数据结构
     public class DataStruct
     { 
+        //最多顶点个数
         public static int MaxVertices=500;
+        //最多边的个数
         public static int MaxEdges=2000;
+        //最多三角形个数
         public static int MaxTriangles = 1000;
+        //顶点集合
         public Vertex[] Vertex=new Vertex[MaxVertices];
+        //三角形集合
         public Triangle[] Triangle = new Triangle[MaxTriangles];
+        // //外接圆心/三角形外星集合
         public Barycenter[] Barycenters = new Barycenter[MaxTriangles]; 
         //不重复的Tin三角网边
         public Edge[] TinEdges = new Edge[MaxEdges];
+        //包围壳
         public BoundaryBox BBOX = new BoundaryBox();  
         //初始索引
         public int VerticesNum = 0;

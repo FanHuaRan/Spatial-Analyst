@@ -6,6 +6,9 @@ using System.Drawing;
 
 namespace MrFan.Tool.Delaunry
 {
+    /// <summary>
+    /// 使用凸包生成实现
+    /// </summary>
     public class Delaynay : ITinVoronoi
     {
         public DataStruct DS
@@ -19,15 +22,27 @@ namespace MrFan.Tool.Delaunry
         //用于计算凸壳的临时辅助结构
         private struct PntV_ID
         {
-            
             public long Value;
             public long ID;
         }
-
-        //建立凸壳
+        //增量法生成Delaunay三角网
+        public void CreateTIN()
+        {
+            //建立凸壳并三角剖分
+            CreateConvex();
+            //三角剖分
+            HullTriangulation();
+            //逐点插入
+            PlugInEveryVertex();
+            //建立边的拓扑结构
+            TopologizeEdge();
+        }
+        //建立逆时针方向的凸壳
         public void CreateConvex()
         {
-            //初始化凸壳顶点链表
+            #region 初始化凸壳顶点链表 
+            //初始化凸壳顶点链表 
+            //若为空则实例化 否则就去除链表的顶点的凸壳标记 然后清除元素
             if (HullPoint == null)
                 HullPoint = new List<long>();
             else
@@ -35,14 +50,19 @@ namespace MrFan.Tool.Delaunry
                 //去除顶点的凸壳标记
                 for (int i = 0; i < HullPoint.Count; i++)
                 {
-                    DS.Vertex[HullPoint[i]].isHullEdge = 0; 
+                    DS.Vertex[HullPoint[i]].isHullEdge = 0;
                 }
                 HullPoint.Clear();
             }
-
-            #region 计算x-y和x+y的最大、最小点、得出一个初步大型包围壳
+            #endregion
+            #region 分别计算x-y和x+y的最大、最小点、得出一个初步大型包围壳
+            //x-y最大代表是最右上方的点
+            //x-y最小代表是最左下方的点
+            //x+y最大代表是最右下方的点
+            //x+y最小代表是最左上方的点
+            //刚好一个大型的包围壳
             PntV_ID MaxMinus, MinMinus, MaxAdd, MinAdd;
-            //用第一点初始化
+            //用顶点序列里面的第一个顶点初始化
             MaxMinus.ID = MinMinus.ID = MaxAdd.ID = MinAdd.ID = DS.Vertex[0].ID;
             MaxMinus.Value = MinMinus.Value = DS.Vertex[0].x - DS.Vertex[0].y;
             MaxAdd.Value = MinAdd.Value = DS.Vertex[0].x + DS.Vertex[0].y;
@@ -75,8 +95,8 @@ namespace MrFan.Tool.Delaunry
                 }
             }
             #endregion
-
-            //加入链表
+            #region 按照左下-右下-右上-左上的逆时针顺序加入凸壳链表中
+            //将4点加入链表
             HullPoint.Add(MinMinus.ID);
             HullPoint.Add(MaxAdd.ID);
             HullPoint.Add(MaxMinus.ID);
@@ -87,13 +107,14 @@ namespace MrFan.Tool.Delaunry
                 if (HullPoint[i] == HullPoint[(i + 1) % HullPoint.Count])
                     HullPoint.RemoveAt(i);
             }
-
-            //将凸壳点标记，下一步不再处理
+            //将凸壳点在顶点序列中标记，下一步插入则不再处理
             for (int i = 0; i < HullPoint.Count; i++)
             {
                 DS.Vertex[HullPoint[i]].isHullEdge = -1;
             }
-            #region 插入其他点
+
+            #endregion
+            #region 循环遍历，根据条件插入其他点
             for (int i = 0; i < DS.VerticesNum; i++)
             {
                 //是凸壳点则直接跳过
@@ -112,49 +133,46 @@ namespace MrFan.Tool.Delaunry
                     PointF pnt3 = new PointF(Convert.ToSingle(DS.Vertex[i].x), Convert.ToSingle(DS.Vertex[i].y));
                     // >0则位于外侧(设备坐标系，逆时针)
                     isOnRight = VectorXMultiply(pnt1, pnt2, pnt3);
-
                     //如果点在边外侧则修改凸壳
                     if (isOnRight >= 0)
                     {
                         //点插入凸边链表
                         HullPoint.Insert((j + 1) % (HullPoint.Count + 1), DS.Vertex[i].ID);
-
                         //判断添加点后是否出现内凹
+                        //根据插入点及其之后两个点三点关系判断
                         pnt1 = new PointF(Convert.ToSingle(DS.Vertex[HullPoint[(j + 3) % HullPoint.Count]].x),
                             Convert.ToSingle(DS.Vertex[HullPoint[(j + 3) % HullPoint.Count]].y));
                         isOnRight = VectorXMultiply(pnt3, pnt2, pnt1);
-                        if (isOnRight > 0)    //删除内凹点p2(即v[j+2])
+                        //删除内凹点p2(即v[j+2])
+                        if (isOnRight > 0)   
                         {
-                            int index = (j + 2) % HullPoint.Count;    //点在凸壳链表中的索引
+                            //点在凸壳链表中的索引
+                            int index = (j + 2) % HullPoint.Count;    
                             DS.Vertex[HullPoint[index]].isHullEdge = 0;
                             HullPoint.RemoveAt(index);
                         }
-
                         break;
                     }
                 }
             }
             #endregion
-
-            //将顶点的凸壳标记设为1
+            //将属于凸壳链表的所有顶点的凸壳标记设为1
             for (int i = 0; i < HullPoint.Count; i++)
                 DS.Vertex[HullPoint[i]].isHullEdge = 1;
         }
-
-        //凸壳三角剖分
+        //凸壳三角剖分 根据凸壳建立初步的三角网
         private void HullTriangulation()
         {
             DS.TriangleNum = 0;
-
             //凸壳为点或线的情况
             //多点共边的情况
-
             //复制凸壳顶点
             List<long> points = new List<long>();
             for (int i = 0; i < HullPoint.Count; i++)
+            {
                 points.Add(HullPoint[i]);
-
-            //构网
+            }
+            //构造大三角形
             long id1, id2, id3;
             while (points.Count >= 3)
             {
@@ -170,109 +188,54 @@ namespace MrFan.Tool.Delaunry
                         DS.Triangle[DS.TriangleNum].V2Index = id2;
                         DS.Triangle[DS.TriangleNum].V3Index = id3;
                         DS.TriangleNum++;
-                        DS.Vertex[id2].isHullEdge = 2;  //标记已构网点
+                        //标记已构网点
+                        DS.Vertex[id2].isHullEdge = 2; 
                         points.Remove(id2);
-
                         break;
                     }
                 }
             }
         }
-
-        //判断三角形外接圆中不含其他凸壳顶点
-        private bool IsClean(long p1ID, long p2ID, long p3ID)
-        {
-            for (int i = 0; i < HullPoint.Count; i++)
-            {
-                //跳过已构网的点和△顶点
-                if (DS.Vertex[HullPoint[i]].isHullEdge == 2 || HullPoint[i] == p1ID || HullPoint[i] == p2ID || HullPoint[i] == p3ID)
-                    continue;
-
-                //如果点i位于△外接圆内
-                if (InTriangleExtCircle(DS.Vertex[HullPoint[i]].x, DS.Vertex[HullPoint[i]].y, DS.Vertex[p1ID].x,
-                    DS.Vertex[p1ID].y, DS.Vertex[p2ID].x, DS.Vertex[p2ID].y, DS.Vertex[p3ID].x, DS.Vertex[p3ID].y))
-                    return false;
-            }
-
-            return true;
-        }
-       
-        //构建并显示Voronoi图
-        //基础建立在Delaunry三角网之上
-        //不断连接
-        public void CreateVoronoi(Graphics g)
-        {
-            //获取每条
-            for (int i = 0; i < DS.TinEdgeNum; i++)
-            {
-                if (!DS.TinEdges[i].NotHullEdge) //△边为凸壳边
-                {
-                    DrawHullVorEdge(i, g);
-                    continue;
-                }
-
-                //连接左/右△的外接圆心
-                //获取边的左右三角形
-                //再进行连接
-                long index1 = DS.TinEdges[i].AdjTriangle1ID;
-                long index2 = DS.TinEdges[i].AdjTriangle2ID;
-                PointF p1 = new PointF(Convert.ToSingle(DS.Barycenters[index1].X), Convert.ToSingle(DS.Barycenters[index1].Y));
-                PointF p2 = new PointF(Convert.ToSingle(DS.Barycenters[index2].X), Convert.ToSingle(DS.Barycenters[index2].Y));
-                //圆心在box外则直接跳过
-                //if (PointInBox(p1) && PointInBox(p2))
-                    g.DrawLine(new Pen(Color.Black, 1), p1, p2);
-            }
-
-        }
-
-        //增量法生成Delaunay三角网
-        public void CreateTIN()
-        {
-            //建立凸壳并三角剖分
-            CreateConvex();
-            HullTriangulation();
-
-            //逐点插入
-            PlugInEveryVertex();
-
-            //建立边的拓扑结构
-            TopologizeEdge();    
-        }
-
         //逐点加入修改TIN
         private void PlugInEveryVertex()
         {
-            Edge[] EdgesBuf = new Edge[DataStruct.MaxTriangles];  //△边缓冲区
-
+            //△边缓冲区
+            Edge[] EdgesBuf = new Edge[DataStruct.MaxTriangles];  
             bool IsInCircle;
             int i, j, k;
             int EdgeCount;
-            for (i = 0; i < DS.VerticesNum; i++)    //逐点加入
+            //逐点加入
+            for (i = 0; i < DS.VerticesNum; i++)    
             {
                 //跳过凸壳顶点
                 if (DS.Vertex[i].isHullEdge != 0)
+                {
                     continue;
-
-                EdgeCount = 0;            
-                for (j = 0; j < DS.TriangleNum; j++) //定位待插入点影响的所有△
+                }
+                EdgeCount = 0;
+                #region 定位待插入点影响的所有三角形并更新
+                //定位待插入点影响的所有三角形
+                for (j = 0; j < DS.TriangleNum; j++) 
                 {
                     IsInCircle = InTriangleExtCircle(DS.Vertex[i].x, DS.Vertex[i].y, DS.Vertex[DS.Triangle[j].V1Index].x, DS.Vertex[DS.Triangle[j].V1Index].y,
                         DS.Vertex[DS.Triangle[j].V2Index].x, DS.Vertex[DS.Triangle[j].V2Index].y,
                         DS.Vertex[DS.Triangle[j].V3Index].x, DS.Vertex[DS.Triangle[j].V3Index].y);
                     if (IsInCircle)    //△j在影响范围内
                     {
+                        //△的三边
                         Edge[] eee ={new Edge(DS.Triangle[j].V1Index, DS.Triangle[j].V2Index),
                             new Edge(DS.Triangle[j].V2Index, DS.Triangle[j].V3Index),
-                            new Edge(DS.Triangle[j].V3Index, DS.Triangle[j].V1Index)};  //△的三边
+                            new Edge(DS.Triangle[j].V3Index, DS.Triangle[j].V1Index)};  
 
                         #region 存储除公共边外的△边
                         bool IsNotComnEdge;
                         for (k = 0; k < 3; k++)
                         {
                             IsNotComnEdge = true;
-                            for(int n=0; n<EdgeCount; n++)
+                            for (int n = 0; n < EdgeCount; n++)
                             {
-                                if (Edge.Compare(eee[k], EdgesBuf[n]))   //此边为公共边
+                                //此边为公共边
+                                if (Edge.Compare(eee[k], EdgesBuf[n]))   
                                 {
                                     //删除已缓存的公共边
                                     IsNotComnEdge = false;
@@ -281,7 +244,6 @@ namespace MrFan.Tool.Delaunry
                                     break;
                                 }
                             }
-
                             if (IsNotComnEdge)
                             {
                                 EdgesBuf[EdgeCount] = eee[k];    //边加入Buffer
@@ -299,19 +261,101 @@ namespace MrFan.Tool.Delaunry
                     }
                 }//for 定位点
 
+                #endregion
                 #region 构建新△
                 for (j = 0; j < EdgeCount; j++)
-                {                    
+                {
                     DS.Triangle[DS.TriangleNum].V1Index = EdgesBuf[j].Vertex1ID;
                     DS.Triangle[DS.TriangleNum].V2Index = EdgesBuf[j].Vertex2ID;
                     DS.Triangle[DS.TriangleNum].V3Index = i;
-                    DS.TriangleNum ++;
+                    DS.TriangleNum++;
                 }
                 #endregion
-            }//逐点加入for
+            }
         }
+       
+        ///<summary>
+        ///建立三角形的三条边的拓扑关系
+        //实际上就是遍历每一个三角形的每条边 
+        //不重复的插入到DS的TinEdges中 并且保存边与点和三角形的对应关系
+        /// </summary>
+        private void TopologizeEdge()
+        {
+            //清除旧数据
+            DS.TinEdgeNum = 0;
+            DS.TinEdges = new Edge[DataStruct.MaxEdges];
+            //3个顶点索引
+            long[] Vindex = new long[3]; 
+            //遍历每个三角形的三条边
+            for (int i = 0; i < DS.TriangleNum; i++)
+            {
+                Vindex[0] = DS.Triangle[i].V1Index;
+                Vindex[1] = DS.Triangle[i].V2Index;
+                Vindex[2] = DS.Triangle[i].V3Index;
+                //每条边
+                for (int j = 0; j < 3; j++)
+                {
+                    Edge e = new Edge(Vindex[j], Vindex[(j + 1) % 3]);
+                    //判断边在数组中是否已存在
+                    int k;
+                    for (k = 0; k < DS.TinEdgeNum; k++)
+                    {
+                        //此边已构造
+                        if (Edge.Compare(e, DS.TinEdges[k]))
+                        {
+                            //存储第二个三角形
+                            DS.TinEdges[k].AdjTriangle2ID = i;
+                            //同时为两个三角形所有则一定不是凸壳边
+                            DS.TinEdges[k].NotHullEdge = true;
+                            break;
+                        }
+                    }
 
-        //计算外接圆圆心
+                    if (k == DS.TinEdgeNum)   //此边为新边
+                    {
+                        //存储于点的关系
+                        DS.TinEdges[DS.TinEdgeNum].Vertex1ID = e.Vertex1ID;
+                        DS.TinEdges[DS.TinEdgeNum].Vertex2ID = e.Vertex2ID;
+                        //存储与三角形的关系
+                        DS.TinEdges[DS.TinEdgeNum].AdjTriangle1ID = i;
+                        //与定点关系
+                        DS.TinEdges[DS.TinEdgeNum].AdjacentT1V3 = Vindex[(j + 2) % 3];
+                        DS.TinEdgeNum++;
+                    }
+
+                }
+            }
+        }
+        /// <summary>
+        ///构建并显示Voronoi图、基础建立在Delaunry三角网之上、不断连接
+        /// </summary>
+        /// <param name="g"></param>
+        public void CreateVoronoi(Graphics g)
+        {
+            //获取每条Tin边
+            for (int i = 0; i < DS.TinEdgeNum; i++)
+            {
+                //△边为凸壳边
+                if (!DS.TinEdges[i].NotHullEdge) 
+                {
+                    //单独画 因为有可能在边缘
+                    DrawHullVorEdge(i, g);
+                    continue;
+                }
+                //连接左/右△的外接圆心
+                //获取边的左右三角形
+                //再进行连接
+                long index1 = DS.TinEdges[i].AdjTriangle1ID;
+                long index2 = DS.TinEdges[i].AdjTriangle2ID;
+                PointF p1 = new PointF(Convert.ToSingle(DS.Barycenters[index1].X), Convert.ToSingle(DS.Barycenters[index1].Y));
+                PointF p2 = new PointF(Convert.ToSingle(DS.Barycenters[index2].X), Convert.ToSingle(DS.Barycenters[index2].Y));
+                //圆心在box外则直接跳过
+                //if (PointInBox(p1) && PointInBox(p2))
+                g.DrawLine(new Pen(Color.Black, 1), p1, p2);
+            }
+
+        }
+        //计算所有三角形的外接圆圆心
         public void CalculateBC()
         {
             double x1, y1, x2, y2, x3, y3;
@@ -326,9 +370,7 @@ namespace MrFan.Tool.Delaunry
                 y3 = DS.Vertex[DS.Triangle[i].V3Index].y;
                 GetTriangleBarycnt(x1, y1, x2, y2, x3, y3, ref DS.Barycenters[i].X, ref DS.Barycenters[i].Y);
             }
-
         }
-
         //求三角形的外接圆心
         private void GetTriangleBarycnt(double x1, double y1, double x2, double y2, double x3, double y3, ref double bcX, ref double bcY)
         {
@@ -368,8 +410,41 @@ namespace MrFan.Tool.Delaunry
                 bcY = k1 * (bcX - MidX1) + MidY1;
             }
         }
+        /// <summary>
+        /// 判断三角形外接圆中不含其他凸壳顶点
+        /// </summary>
+        /// <param name="p1ID"></param>
+        /// <param name="p2ID"></param>
+        /// <param name="p3ID"></param>
+        /// <returns></returns>
+        private bool IsClean(long p1ID, long p2ID, long p3ID)
+        {
+            for (int i = 0; i < HullPoint.Count; i++)
+            {
+                //跳过已构网的点和△顶点
+                if (DS.Vertex[HullPoint[i]].isHullEdge == 2 || HullPoint[i] == p1ID || HullPoint[i] == p2ID || HullPoint[i] == p3ID)
+                    continue;
 
-        //判断点是否在△的外接圆中
+                //如果点i位于△外接圆内
+                if (InTriangleExtCircle(DS.Vertex[HullPoint[i]].x, DS.Vertex[HullPoint[i]].y, DS.Vertex[p1ID].x,
+                    DS.Vertex[p1ID].y, DS.Vertex[p2ID].x, DS.Vertex[p2ID].y, DS.Vertex[p3ID].x, DS.Vertex[p3ID].y))
+                    return false;
+            }
+
+            return true;
+        }
+        /// <summary>
+        /// 判断点是否在△的外接圆中
+        /// </summary>
+        /// <param name="xp"></param>
+        /// <param name="yp"></param>
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="x3"></param>
+        /// <param name="y3"></param>
+        /// <returns></returns>
         private Boolean InTriangleExtCircle(double xp, double yp, double x1, double y1, double x2, double y2, double x3, double y3)
         {
             double RadiusSquare;    //半径的平方
@@ -385,59 +460,16 @@ namespace MrFan.Tool.Delaunry
             else
                 return false;
         }
-
-        //建立三角形的三条边的拓扑关系
-        //实际上就是遍历每一个三角形的每条边 
-        //不重复的插入到DS的TinEdges中 并且保存边与点和三角形的对应关系
-        private void TopologizeEdge()
-        {
-            DS.TinEdgeNum = 0;
-            DS.TinEdges = new Edge[DataStruct.MaxEdges];   //清除旧数据
-            long[] Vindex = new long[3]; //3个顶点索引
-
-            //遍历每个三角形的三条边
-            for (int i = 0; i < DS.TriangleNum; i++)
-            {
-                Vindex[0] = DS.Triangle[i].V1Index;
-                Vindex[1] = DS.Triangle[i].V2Index;
-                Vindex[2] = DS.Triangle[i].V3Index;
-                //每条边
-                for (int j = 0; j < 3; j++)   
-                {
-                    Edge e = new Edge(Vindex[j],Vindex[(j + 1) % 3]);
-
-                    //判断边在数组中是否已存在
-                    int k;
-                    for (k = 0; k < DS.TinEdgeNum; k++)
-                    {
-                        if (Edge.Compare(e, DS.TinEdges[k]))   //此边已构造
-                        {
-                            DS.TinEdges[k].AdjTriangle2ID = i;
-                            DS.TinEdges[k].NotHullEdge = true;
-                            break;
-                        }
-                    }
-
-                    if (k == DS.TinEdgeNum)   //此边为新边
-                    {
-                        //存储于点的关系
-                        DS.TinEdges[DS.TinEdgeNum].Vertex1ID = e.Vertex1ID;
-                        DS.TinEdges[DS.TinEdgeNum].Vertex2ID = e.Vertex2ID;
-                        //存储与三角形的关系
-                        DS.TinEdges[DS.TinEdgeNum].AdjTriangle1ID = i;
-                        //与定点关系
-                        DS.TinEdges[DS.TinEdgeNum].AdjacentT1V3 = Vindex[(j + 2) % 3];
-                        DS.TinEdgeNum++;
-                    }
-
-                }
-            }
-        }
-
-        //i为TinEdge的ID号
+        /// <summary>
+        /// 画凸壳边的泰森
+        /// </summary>
+        /// <param name="i">TinEdge的ID号</param>
+        /// <param name="g"></param>
         private void DrawHullVorEdge(int i, Graphics g)
         {
-            
+            //求出凸壳边的中点 
+            //外心和中点的连线就是中垂线，求出中垂线与包围壳的交点
+            //连接该三角形外心和交点
             PointF pnt1 = new PointF(Convert.ToSingle(DS.Vertex[DS.TinEdges[i].Vertex1ID].x),
                 Convert.ToSingle(DS.Vertex[DS.TinEdges[i].Vertex1ID].y));
             PointF pnt2 = new PointF(Convert.ToSingle(DS.Vertex[DS.TinEdges[i].Vertex2ID].x), 
@@ -531,7 +563,6 @@ namespace MrFan.Tool.Delaunry
             g.DrawLine(new Pen(Color.Black, 1), BaryCnt, EndPnt);
 
         }
-
         //index为TinEdge的索引号
         //若为钝角边则返回true
         private bool IsObtuseEdge(int index)
@@ -576,7 +607,13 @@ namespace MrFan.Tool.Delaunry
             else
                 return false;
         }
-       //判读点与线的关系 >0
+       /// <summary>
+        /// 运用右手法则判读点与线的关系
+       /// </summary>
+       /// <param name="BaryCnt"></param>
+       /// <param name="pnt1"></param>
+       /// <param name="pnt2"></param>
+        /// <returns> 结果>0在右方、等于0在线段所在直线上，否则在左方</returns>
         private double VectorXMultiply(PointF BaryCnt, PointF pnt1, PointF pnt2)
         {
             PointF V1 = new PointF((pnt1.X - BaryCnt.X), (pnt1.Y - BaryCnt.Y));
