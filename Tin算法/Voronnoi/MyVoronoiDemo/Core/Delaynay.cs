@@ -172,7 +172,7 @@ namespace MrFan.Tool.Delaunry
             {
                 points.Add(HullPoint[i]);
             }
-            //构造大三角形
+            //构造大三角网
             long id1, id2, id3;
             while (points.Count >= 3)
             {
@@ -188,7 +188,7 @@ namespace MrFan.Tool.Delaunry
                         DS.Triangle[DS.TriangleNum].V2Index = id2;
                         DS.Triangle[DS.TriangleNum].V3Index = id3;
                         DS.TriangleNum++;
-                        //标记已构网点
+                        //标记其为凸壳点
                         DS.Vertex[id2].isHullEdge = 2; 
                         points.Remove(id2);
                         break;
@@ -217,6 +217,7 @@ namespace MrFan.Tool.Delaunry
                 //定位待插入点影响的所有三角形
                 for (j = 0; j < DS.TriangleNum; j++) 
                 {
+					//判断点是否在△的外接圆中
                     IsInCircle = InTriangleExtCircle(DS.Vertex[i].x, DS.Vertex[i].y, DS.Vertex[DS.Triangle[j].V1Index].x, DS.Vertex[DS.Triangle[j].V1Index].y,
                         DS.Vertex[DS.Triangle[j].V2Index].x, DS.Vertex[DS.Triangle[j].V2Index].y,
                         DS.Vertex[DS.Triangle[j].V3Index].x, DS.Vertex[DS.Triangle[j].V3Index].y);
