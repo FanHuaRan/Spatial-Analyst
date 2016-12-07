@@ -14,7 +14,7 @@ namespace OverlayDemo.Core
         //射线算法中用于构建射线
         private int MINVALUE = -1;
         //误差值
-        private int rightValue = 200;
+        private int rightValue = 700;
         /// <summary>
         /// 利用右手法则判断关系 
         /// </summary>
