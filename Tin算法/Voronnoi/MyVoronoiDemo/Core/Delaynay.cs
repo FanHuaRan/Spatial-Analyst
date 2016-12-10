@@ -28,11 +28,11 @@ namespace MrFan.Tool.Delaunry
         //增量法生成Delaunay三角网
         public void CreateTIN()
         {
-            //建立凸壳并三角剖分
+            //建立凸壳
             CreateConvex();
-            //三角剖分
+            //初始三角剖分
             HullTriangulation();
-            //逐点插入
+            //逐点插入修改Tin
             PlugInEveryVertex();
             //建立边的拓扑结构
             TopologizeEdge();
@@ -156,13 +156,18 @@ namespace MrFan.Tool.Delaunry
                 }
             }
             #endregion
-            //将属于凸壳链表的所有顶点的凸壳标记设为1
+            #region 对凸壳顶点进行标记
             for (int i = 0; i < HullPoint.Count; i++)
+            {
+                //将属于凸壳链表的顶点的凸壳标记设为1
                 DS.Vertex[HullPoint[i]].isHullEdge = 1;
+            }
+            #endregion
         }
         //凸壳三角剖分 根据凸壳建立初步的三角网
         private void HullTriangulation()
         {
+            //初始化三角形个数为0
             DS.TriangleNum = 0;
             //凸壳为点或线的情况
             //多点共边的情况
@@ -172,23 +177,24 @@ namespace MrFan.Tool.Delaunry
             {
                 points.Add(HullPoint[i]);
             }
-            //构造大三角网
+            //对所有凸壳顶点有序进行三角网的构建
             long id1, id2, id3;
             while (points.Count >= 3)
             {
                 for (int i = 0; i < points.Count; i++)
                 {
-                    //△为干净的则加入网中
+                    //将相邻三个顶点构建三角形 
                     id1 = points[i];
                     id2 = points[(i + 1) % points.Count];
                     id3 = points[(i + 2) % points.Count];
+                    //三角形为干净的则加入网中
                     if (IsClean(id1, id2, id3))
                     {
                         DS.Triangle[DS.TriangleNum].V1Index = id1;
                         DS.Triangle[DS.TriangleNum].V2Index = id2;
                         DS.Triangle[DS.TriangleNum].V3Index = id3;
                         DS.TriangleNum++;
-                        //标记其为凸壳点
+                        //标记顶点为已经处理过的凸壳点
                         DS.Vertex[id2].isHullEdge = 2; 
                         points.Remove(id2);
                         break;
@@ -196,10 +202,12 @@ namespace MrFan.Tool.Delaunry
                 }
             }
         }
-        //逐点加入修改TIN
+        /// <summary>
+        /// 逐点加入修改TIN
+        /// </summary>
         private void PlugInEveryVertex()
         {
-            //△边缓冲区
+            //非公共边缓冲区
             Edge[] EdgesBuf = new Edge[DataStruct.MaxTriangles];  
             bool IsInCircle;
             int i, j, k;
@@ -213,7 +221,7 @@ namespace MrFan.Tool.Delaunry
                     continue;
                 }
                 EdgeCount = 0;
-                #region 定位待插入点影响的所有三角形并更新
+                #region 定位待插入点影响的所有三角形、删除受影响的三角形、同时保存这些三角形的非公共边
                 //定位待插入点影响的所有三角形
                 for (j = 0; j < DS.TriangleNum; j++) 
                 {
@@ -221,13 +229,13 @@ namespace MrFan.Tool.Delaunry
                     IsInCircle = InTriangleExtCircle(DS.Vertex[i].x, DS.Vertex[i].y, DS.Vertex[DS.Triangle[j].V1Index].x, DS.Vertex[DS.Triangle[j].V1Index].y,
                         DS.Vertex[DS.Triangle[j].V2Index].x, DS.Vertex[DS.Triangle[j].V2Index].y,
                         DS.Vertex[DS.Triangle[j].V3Index].x, DS.Vertex[DS.Triangle[j].V3Index].y);
-                    if (IsInCircle)    //△j在影响范围内
+                    //三角形J在影响范围内
+                    if (IsInCircle)   
                     {
-                        //△的三边
+                        //先获取到三角形的三边
                         Edge[] eee ={new Edge(DS.Triangle[j].V1Index, DS.Triangle[j].V2Index),
                             new Edge(DS.Triangle[j].V2Index, DS.Triangle[j].V3Index),
                             new Edge(DS.Triangle[j].V3Index, DS.Triangle[j].V1Index)};  
-
                         #region 存储除公共边外的△边
                         bool IsNotComnEdge;
                         for (k = 0; k < 3; k++)
@@ -236,34 +244,33 @@ namespace MrFan.Tool.Delaunry
                             for (int n = 0; n < EdgeCount; n++)
                             {
                                 //此边为公共边
+                                //则删除已缓存的公共边
                                 if (Edge.Compare(eee[k], EdgesBuf[n]))   
                                 {
-                                    //删除已缓存的公共边
                                     IsNotComnEdge = false;
                                     EdgesBuf[n] = EdgesBuf[EdgeCount - 1];
                                     EdgeCount--;
                                     break;
                                 }
                             }
+                            //不是公共边则加入缓冲区中
                             if (IsNotComnEdge)
                             {
-                                EdgesBuf[EdgeCount] = eee[k];    //边加入Buffer
+                                EdgesBuf[EdgeCount] = eee[k];  
                                 EdgeCount++;
                             }
                         }
                         #endregion
-
-                        //删除△j, 表尾△前移插入
+                        //删除三角形J, 三角形数组整体前移
                         DS.Triangle[j].V1Index = DS.Triangle[DS.TriangleNum - 1].V1Index;
                         DS.Triangle[j].V2Index = DS.Triangle[DS.TriangleNum - 1].V2Index;
                         DS.Triangle[j].V3Index = DS.Triangle[DS.TriangleNum - 1].V3Index;
                         j--;
                         DS.TriangleNum--;
                     }
-                }//for 定位点
-
+                }
                 #endregion
-                #region 构建新△
+                #region 将非公共边与顶点构成新三角形
                 for (j = 0; j < EdgeCount; j++)
                 {
                     DS.Triangle[DS.TriangleNum].V1Index = EdgesBuf[j].Vertex1ID;
@@ -277,8 +284,9 @@ namespace MrFan.Tool.Delaunry
        
         ///<summary>
         ///建立三角形的三条边的拓扑关系
-        //实际上就是遍历每一个三角形的每条边 
-        //不重复的插入到DS的TinEdges中 并且保存边与点和三角形的对应关系
+        ///实际上就是遍历每一个三角形的每条边 
+        ///不重复的插入到DS的TinEdges中 
+        ///并且保存边与点和三角形的对应关系
         /// </summary>
         private void TopologizeEdge()
         {
@@ -336,7 +344,7 @@ namespace MrFan.Tool.Delaunry
             //获取每条Tin边
             for (int i = 0; i < DS.TinEdgeNum; i++)
             {
-                //△边为凸壳边
+                //三角形边为凸壳边
                 if (!DS.TinEdges[i].NotHullEdge) 
                 {
                     //单独画 因为有可能在边缘
@@ -356,7 +364,9 @@ namespace MrFan.Tool.Delaunry
             }
 
         }
-        //计算所有三角形的外接圆圆心
+        /// <summary>
+        /// 计算所有三角形的外接圆圆心
+        /// </summary>
         public void CalculateBC()
         {
             double x1, y1, x2, y2, x3, y3;
@@ -372,7 +382,17 @@ namespace MrFan.Tool.Delaunry
                 GetTriangleBarycnt(x1, y1, x2, y2, x3, y3, ref DS.Barycenters[i].X, ref DS.Barycenters[i].Y);
             }
         }
-        //求三角形的外接圆心
+        /// <summary>
+        /// 求三角形的外接圆心
+        /// </summary>
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="x3"></param>
+        /// <param name="y3"></param>
+        /// <param name="bcX"></param>
+        /// <param name="bcY"></param>
         private void GetTriangleBarycnt(double x1, double y1, double x2, double y2, double x3, double y3, ref double bcX, ref double bcY)
         {
             double precision = 0.000001;
@@ -412,7 +432,7 @@ namespace MrFan.Tool.Delaunry
             }
         }
         /// <summary>
-        /// 判断三角形外接圆中不含其他凸壳顶点
+        /// 判断三角形外接圆中不含其他凸壳顶点 空圆法则
         /// </summary>
         /// <param name="p1ID"></param>
         /// <param name="p2ID"></param>
@@ -422,11 +442,11 @@ namespace MrFan.Tool.Delaunry
         {
             for (int i = 0; i < HullPoint.Count; i++)
             {
-                //跳过已构网的点和△顶点
+                //跳过已构网的凸壳点和三角形顶点
                 if (DS.Vertex[HullPoint[i]].isHullEdge == 2 || HullPoint[i] == p1ID || HullPoint[i] == p2ID || HullPoint[i] == p3ID)
                     continue;
 
-                //如果点i位于△外接圆内
+                //如果点i位于三角形外接圆内
                 if (InTriangleExtCircle(DS.Vertex[HullPoint[i]].x, DS.Vertex[HullPoint[i]].y, DS.Vertex[p1ID].x,
                     DS.Vertex[p1ID].y, DS.Vertex[p2ID].x, DS.Vertex[p2ID].y, DS.Vertex[p3ID].x, DS.Vertex[p3ID].y))
                     return false;
@@ -435,7 +455,9 @@ namespace MrFan.Tool.Delaunry
             return true;
         }
         /// <summary>
-        /// 判断点是否在△的外接圆中
+        /// 判断点是否在三角形的外接圆中
+        /// 先求得该三角形外心和外接圆半径
+        /// 再根据该点到外心的距离和半径的大小得出结论
         /// </summary>
         /// <param name="xp"></param>
         /// <param name="yp"></param>
@@ -446,7 +468,7 @@ namespace MrFan.Tool.Delaunry
         /// <param name="x3"></param>
         /// <param name="y3"></param>
         /// <returns></returns>
-        private Boolean InTriangleExtCircle(double xp, double yp, double x1, double y1, double x2, double y2, double x3, double y3)
+        private bool InTriangleExtCircle(double xp, double yp, double x1, double y1, double x2, double y2, double x3, double y3)
         {
             double RadiusSquare;    //半径的平方
             double DisSquare;  //距离的平方
@@ -462,7 +484,7 @@ namespace MrFan.Tool.Delaunry
                 return false;
         }
         /// <summary>
-        /// 画凸壳边的泰森
+        /// 画凸壳边的泰森边
         /// </summary>
         /// <param name="i">TinEdge的ID号</param>
         /// <param name="g"></param>
@@ -496,10 +518,10 @@ namespace MrFan.Tool.Delaunry
             else
                 k = (pnt1.X - pnt2.X) / (pnt2.Y - pnt1.Y);
 
-            //该凸壳边是△的钝角边则外接圆心在△外
+            //该凸壳边是三角形的钝角边则外接圆心在三角形外
             bool obtEdge = IsObtuseEdge(i);  
 
-            #region 根据△圆心在凸壳内还是在外求VEdge
+            #region 根据三角形圆心在凸壳内还是在外求VEdge
             //圆心在边右则往左延伸，在左则往右
 
             if (!obtEdge)   //圆心在凸壳内(或边界上)/////////////////////////////////
@@ -564,8 +586,12 @@ namespace MrFan.Tool.Delaunry
             g.DrawLine(new Pen(Color.Black, 1), BaryCnt, EndPnt);
 
         }
-        //index为TinEdge的索引号
-        //若为钝角边则返回true
+     
+        /// <summary>
+        /// 若为钝角边则返回true
+        /// </summary>
+        /// <param name="index">index为TinEdge的索引号</param>
+        /// <returns></returns>
         private bool IsObtuseEdge(int index)
         {
             PointF EdgePnt1 = new PointF(Convert.ToSingle(DS.Vertex[DS.TinEdges[index].Vertex1ID].x),
@@ -579,8 +605,12 @@ namespace MrFan.Tool.Delaunry
             PointF V2 = new PointF((EdgePnt2.X - Pnt3.X), (EdgePnt2.Y - Pnt3.Y));
             return (V1.X * V2.X + V1.Y * V2.Y) < 0; //a·b的值<0则为钝角
         }
-
-        //判读点与三角形的关系 点在△内则返回true
+        /// <summary>
+        /// 判读点与三角形的关系 点在三角形内则返回true
+        /// </summary>
+        /// <param name="PntIndex"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
         private bool PointInTriganle(long PntIndex, long index)
         {
             PointF pnt1 = new PointF(Convert.ToSingle(DS.Vertex[DS.Triangle[index].V1Index].x),
@@ -621,7 +651,11 @@ namespace MrFan.Tool.Delaunry
             PointF V2 = new PointF((pnt2.X - BaryCnt.X), (pnt2.Y - BaryCnt.Y));
             return (V1.X * V2.Y - V2.X * V1.Y);
         }
-        //判断点是否在包围壳中
+        /// <summary>
+        /// 判断点是否在包围壳中
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
         private bool PointInBox(PointF point)
         {
             return (point.X >= DS.BBOX.XLeft && point.X <= DS.BBOX.XRight &&
