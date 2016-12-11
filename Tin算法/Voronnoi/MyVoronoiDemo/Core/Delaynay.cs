@@ -221,11 +221,16 @@ namespace MrFan.Tool.Delaunry
                     continue;
                 }
                 EdgeCount = 0;
-                #region 定位待插入点影响的所有三角形、删除受影响的三角形、同时保存这些三角形的非公共边
+                #region 插入和修正
+              // 定位待插入点影响的所有三角形
+             ///删除受影响的三角形、同时保存这些三角形之间的不重复边
+             ///将这些边与该点组成新的三角形
+             ///这些三角形后面也会被进行检查！！
+               
                 //定位待插入点影响的所有三角形
                 for (j = 0; j < DS.TriangleNum; j++) 
                 {
-					//判断点是否在△的外接圆中
+					//判断点是否在三角形的外接圆中
                     IsInCircle = InTriangleExtCircle(DS.Vertex[i].x, DS.Vertex[i].y, DS.Vertex[DS.Triangle[j].V1Index].x, DS.Vertex[DS.Triangle[j].V1Index].y,
                         DS.Vertex[DS.Triangle[j].V2Index].x, DS.Vertex[DS.Triangle[j].V2Index].y,
                         DS.Vertex[DS.Triangle[j].V3Index].x, DS.Vertex[DS.Triangle[j].V3Index].y);
@@ -236,15 +241,14 @@ namespace MrFan.Tool.Delaunry
                         Edge[] eee ={new Edge(DS.Triangle[j].V1Index, DS.Triangle[j].V2Index),
                             new Edge(DS.Triangle[j].V2Index, DS.Triangle[j].V3Index),
                             new Edge(DS.Triangle[j].V3Index, DS.Triangle[j].V1Index)};  
-                        #region 存储除公共边外的△边
+                        #region 存储除公共边外的三角形边
                         bool IsNotComnEdge;
                         for (k = 0; k < 3; k++)
                         {
                             IsNotComnEdge = true;
                             for (int n = 0; n < EdgeCount; n++)
                             {
-                                //此边为公共边
-                                //则删除已缓存的公共边
+                                //删除已缓存的公共边
                                 if (Edge.Compare(eee[k], EdgesBuf[n]))   
                                 {
                                     IsNotComnEdge = false;
