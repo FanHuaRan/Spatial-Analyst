@@ -11,7 +11,7 @@ namespace MrFan.Tool.Delaunry
         public long x;
         public long y;
         public long ID;
-        public int isHullEdge; //凸壳顶点标记,系统初始化为0
+        public int isHullEdge; //凸壳顶点标记,普通点为0，凸壳未处理点为1 凸壳已处理点为2
 
         //相等则返回true
         public static bool Compare(Vertex a, Vertex b)
