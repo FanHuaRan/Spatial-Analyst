@@ -7,7 +7,7 @@ using System.Drawing;
 namespace MrFan.Tool.Delaunry
 {
     /// <summary>
-    /// 使用凸包生成实现
+    /// 使用凸包内插算法实现
     /// </summary>
     public class Delaynay : ITinVoronoi
     {
